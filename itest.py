@@ -1,11 +1,14 @@
-# import variables as ITEST_Variables - ITEST_Arguments.parse()
-import meta as ITEST_Meta
+import config-variables as ITEST_ConfigVariables
 
 import sys
 import argparse
 import typing
+import os
 
-def itest(arguments: typing.List[str]) -> None:
+
+def itest(config_variables_file: str, arguments: typing.List[str]) -> None:
+    prev_config_variables_file_mod_time = ITEST_ConfigVariables.initialize(config_variables_file)
+
     arg_parser = argparse.ArgumentParser(description=f"{ITEST_Meta.NAME}, version: {ITEST_Meta.VERSION}\n{ITEST_Meta.DESCRIPTION}", epilog=f"Copyright (C) 2018, {ITEST_Meta.AUTHOR}", formatter_class=argparse.RawDescriptionHelpFormatter)
 
     arg_parser.add_argument("-g", "--gui", dest="want_gui", action="store_true", default=True, help=f"run {ITEST_Meta.NAME} with a graphical user interface (default)")
@@ -13,13 +16,19 @@ def itest(arguments: typing.List[str]) -> None:
 
     args: argparse.Namespace = arg_parser.parse_intermixed_args()
 
-    '''
-    if args.want_gui:
-        ITEST_Ui.gui_run()
-    else:
-        ITEST_Ui.cli_run()
-    '''
-        
+    while True:
+        cur_config_variables_file_mod_time = os.stat(config_variables_file).st_mtime
+        if cur_config_variables_file_mod_time != prev_config_variables_file_mod_time:
+            ITEST_ConfigVariables.reload(config_variables_file)
+            prev_config_variables_file_mod_time = cur_config_variables_file_mod_time 
+
+        if args.want_gui:
+            ITEST_Ui.gui_render()
+        else:
+            ITEST_Ui.cli_render()
+
 
 if __name__ == "__main__":
-    itest(sys.argv[1:])
+  CONFIG_FILE: str = "config.variables"
+
+  itest(CONFIG_FILE, sys.argv[1:])

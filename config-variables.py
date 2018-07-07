@@ -33,10 +33,6 @@ holders: typing.List[ValueHolder]
 def add_value_holder(holder: Any):
     holders.push(ValueHolder(type(holder), holder)
 
-'''
-if os.stat(config_file).st_mtime != previous_modify_time:
-    reload_variables()
-'''
 
 
 def init(config_variables_file_name: str) -> None:
@@ -44,6 +40,8 @@ def init(config_variables_file_name: str) -> None:
     add_value_holder(misc)
 
     reload_variables()
+
+    return os.stat(config_variables_file).st_mtime
 
 def reload_variables():
     if os.path.exists(config_variables_file_name):
