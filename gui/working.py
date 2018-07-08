@@ -13,6 +13,8 @@ def gui_run() -> None:
     WINDOW_MARGIN_WIDTH: int = 50
 
     window_root: tkinter.Tk = tkinter.Tk()
+    window_root.grid_rowconfigure(0, weight=1)
+    window_root.grid_columnconfigure(0, weight=1)
     SCREEN_WIDTH: int = window_root.winfo_screenwidth()
     SCREEN_HEIGHT: int = window_root.winfo_screenheight()
 
@@ -23,11 +25,38 @@ def gui_run() -> None:
     window_console: tkinter.Tk = window_root
     window_console.title(WINDOW_CONSOLE_TITLE)
     window_console.geometry(f"{WINDOW_CONSOLE_WIDTH}x{WINDOW_CONSOLE_HEIGHT}+{WINDOW_CONSOLE_X}+{WINDOW_CONSOLE_Y}")
+    window_console_frame: tkinter.Frame = tkinter.Frame(master=window_console, padx=12, pady=12)
+    window_console_frame.grid(column=0, row=0, sticky="nsew")
 
-    window_console_menu: tkinter.Menu = tkinter.Menu(window_console)
-    window_console_menu_file: tkinter.Menu = tkinter.Menu(window_console_menu, tearoff=0)
-    window_console_menu.add_cascade(label="File", menu=window_console_menu_file)
-    window_console.config(menu=window_console_menu)
+    window_console_frame.grid_columnconfigure(0, weight=10)
+    window_console_frame.grid_columnconfigure(1, weight=10)
+    window_console_frame.grid_columnconfigure(2, weight=10)
+    window_console_frame.grid_columnconfigure(3, weight=10)
+    window_console_frame.grid_columnconfigure(4, weight=10)
+    window_console_frame.grid_columnconfigure(5, weight=10)
+    window_console_frame.grid_columnconfigure(6, weight=1)
+    window_console_frame.grid_rowconfigure(0, weight=10)
+    window_console_frame.grid_rowconfigure(1, weight=10)
+    window_console_frame.grid_rowconfigure(2, weight=10)
+    window_console_frame.grid_rowconfigure(3, weight=10)
+    window_console_frame.grid_rowconfigure(4, weight=10)
+    window_console_frame.grid_rowconfigure(5, weight=1)
+    window_console_frame.grid_rowconfigure(6, weight=10)
+
+    window_console_text: tkinter.Text = tkinter.Text(master=window_console_frame, wrap="word")
+    window_console_text.insert("1.0", "text here") # "line.column"
+    # window_console_text.config(state="disabled")
+    # window_console_text.see("end")
+    window_console_text.grid(row=0, column=0, rowspan=5, columnspan=6, sticky="nsew")
+    window_console_text_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(master=window_console_frame)
+    window_console_text.configure(yscrollcommand=window_console_text_scrollbar.set)
+    window_console_text_scrollbar.config(command=window_console_text.yview)
+    window_console_text_scrollbar.grid(row=0, rowspan=5, column=6, sticky="nsw")
+
+    window_console_command_entry: tkinter.Entry = tkinter.Entry(master=window_console_frame)
+    window_console_command_entry.grid(row=6, column=0, columnspan=5, sticky="we", ipady="2", ipadx="2")
+    window_console_command_entry_button: tkinter.Button = tkinter.Button(master=window_console_frame, text="Enter")
+    window_console_command_entry_button.grid(row=6, column=5, columnspan=2, sticky="we")
 
     WINDOW_VIEWER_X: int = WINDOW_CONSOLE_X + WINDOW_MARGIN_WIDTH + WINDOW_VIEWER_WIDTH
     WINDOW_VIEWER_Y: int = int((SCREEN_HEIGHT / 2) - ((WINDOW_VIEWER_HEIGHT) / 2))
@@ -35,23 +64,10 @@ def gui_run() -> None:
     window_viewer.title(WINDOW_VIEWER_TITLE)
     window_viewer.geometry(f"{WINDOW_VIEWER_WIDTH}x{WINDOW_VIEWER_HEIGHT}+{WINDOW_VIEWER_X}+{WINDOW_VIEWER_Y}")
 
+    window_console.focus_force()
     window_root.mainloop() 
-'''
-tkinter.Entry(root_window, width=60).grid(row=0, column=0, columnspan=9, padx=20, pady=20)
-tkinter.Button(root_window, text="Enter").grid(row=0, column=10, padx=2, pady=2)
-tkinter.Entry(root_window, width=60).grid(row=1, column=0, columnspan=9)
-tkinter.Button(root_window, text="Enter2").grid(row=1, column=10, padx=2, pady=2)
-'''
-
-
 
 '''
-main_frame = tkinter.Frame(root_window, padx=12, pady=3)
-main_frame.grid(column=0, row=0)
-main_frame.columnconfigure(0, weight=1)
-main_frame.rowconfigure(0, weight=1)
-
-text = tkinter.text(state="readonly")
 
 text_field = tkinter.Text(root_window, height=10, width=30)
 text_field.grid()
