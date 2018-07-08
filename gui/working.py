@@ -1,5 +1,6 @@
 # can also do: tkinter.mainloop()
 import tkinter
+import typing
 
 def gui_run() -> None:
     WINDOW_CONSOLE_WIDTH: int = 600
@@ -44,9 +45,7 @@ def gui_run() -> None:
     window_console_frame.grid_rowconfigure(6, weight=10)
 
     window_console_text: tkinter.Text = tkinter.Text(master=window_console_frame, wrap="word")
-    window_console_text.insert("1.0", "text here") # "line.column"
-    # window_console_text.config(state="disabled")
-    # window_console_text.see("end")
+    window_console_text.config(state="disabled")
     window_console_text.grid(row=0, column=0, rowspan=5, columnspan=6, sticky="nsew")
     window_console_text_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(master=window_console_frame)
     window_console_text.configure(yscrollcommand=window_console_text_scrollbar.set)
@@ -55,7 +54,13 @@ def gui_run() -> None:
 
     window_console_command_entry: tkinter.Entry = tkinter.Entry(master=window_console_frame)
     window_console_command_entry.grid(row=6, column=0, columnspan=5, sticky="we", ipady="2", ipadx="2")
+    window_console_command_entry.focus_set()
+
+    process_command: typing.Callable[[tkinter.Event], None] = lambda event: _process_command(window_console_command_entry, window_console_text)
+    window_console_command_entry.bind("<Return>", process_command)
     window_console_command_entry_button: tkinter.Button = tkinter.Button(master=window_console_frame, text="Enter")
+    window_console_command_entry_button.bind("<Button-1>", process_command)
+
     window_console_command_entry_button.grid(row=6, column=5, columnspan=2, sticky="we")
 
     WINDOW_VIEWER_X: int = WINDOW_CONSOLE_X + WINDOW_MARGIN_WIDTH + WINDOW_VIEWER_WIDTH
@@ -67,11 +72,14 @@ def gui_run() -> None:
     window_console.focus_force()
     window_root.mainloop() 
 
-'''
+def _process_command(command_entry: tkinter.Entry, console_text: tkinter.Text) -> None:
+    text: str = command_entry.get()
+    command_entry.delete(0, "end")  
+    console_text.config(state="normal")
+    console_text.insert("end", f"{text}\n")
+    console_text.see("end")
+    console_text.config(state="disabled")
 
-text_field = tkinter.Text(root_window, height=10, width=30)
-text_field.grid()
-'''
 
 if __name__ == "__main__":
     gui_run()
