@@ -23,9 +23,11 @@ def itest(config_variables_file: str, arguments: typing.List[str]) -> None:
             prev_config_variables_file_mod_time = cur_config_variables_file_mod_time 
 
         if args.want_gui:
-            ITEST_Ui.gui_render()
+            import gui as ITEST_GUI
+            ITEST_GUI.run()
         else:
-            ITEST_Ui.cli_render()
+            import cli as ITEST_CLI
+            ITEST_CLI.run()
 
 
 if __name__ == "__main__":

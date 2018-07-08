@@ -1,8 +1,7 @@
-# this is a comment
-:/audio
-
-
-
-:/misc
-
-
+# consider implementing Vim autosave feature
+:/Gui
+bg_color "#000000"
+fg_color "#000000"
+font ""
+font_color "#"
+font_size "3"

@@ -1,5 +1,3 @@
-# consider implementing Vim autosave feature
-
 # import logger as ITEST_Logger
 
 import typing
@@ -7,10 +5,10 @@ import dataclasses
 import shlex
 import os
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Meta:
     name: str = "ITest"
-    version: str = "0.0.1"
+    version: str = "v0.0.1"
     description: str = "Some description"
     author: str = "Ryan McClue"
 

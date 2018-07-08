@@ -1,3 +1,0 @@
-mapt --> pass: Storageclass18 (07/07/2018 --> 14 day trial)
-
-widget, geometry, callback

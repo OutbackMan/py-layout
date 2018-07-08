@@ -1,11 +1,28 @@
-# can also do: tkinter.mainloop()
+# import config-variables as ITEST_ConfigVariables
+
 import tkinter
 import typing
 
-def gui_run() -> None:
-    WINDOW_CONSOLE_WIDTH: int = 600
-    WINDOW_CONSOLE_HEIGHT: int = 600
-    WINDOW_CONSOLE_TITLE: str = "CONSOLE"
+# font, text colour (red and normal)
+
+# colour: #000000.#FFFFFF
+# .config(background=bg_color, fg=foreground_color)
+# must do explicit import tkinter.font
+
+def run_gui() -> None:
+    root_window: tkinter.Tk = tkinter.Tk()
+
+    console_window: tkinter.Tk = _create_console_window(root_window)
+    viewer_window: tkinter.Toplevel = _create_viewer_window(root_window)
+
+    _center_windows(root_window, console_window, viewer_window)
+
+     
+
+def _window_console_create():
+    CONSOLE_TITLE: str = f"{ITEST_ConfigVariables.META.name} ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}"
+    CONSOLE_WIDTH: int = 600
+    CONSOLE_HEIGHT: int = 600
 
     WINDOW_VIEWER_WIDTH: int = 600
     WINDOW_VIEWER_HEIGHT: int = 600
@@ -45,6 +62,7 @@ def gui_run() -> None:
     window_console_frame.grid_rowconfigure(6, weight=10)
 
     window_console_text: tkinter.Text = tkinter.Text(master=window_console_frame, wrap="word")
+    window_console_text.insert("end", "Hello there!\n")
     window_console_text.config(state="disabled")
     window_console_text.grid(row=0, column=0, rowspan=5, columnspan=6, sticky="nsew")
     window_console_text_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(master=window_console_frame)
@@ -68,6 +86,7 @@ def gui_run() -> None:
     window_viewer: tkinter.Toplevel = tkinter.Toplevel(window_console)
     window_viewer.title(WINDOW_VIEWER_TITLE)
     window_viewer.geometry(f"{WINDOW_VIEWER_WIDTH}x{WINDOW_VIEWER_HEIGHT}+{WINDOW_VIEWER_X}+{WINDOW_VIEWER_Y}")
+    # tkinter.PhotoImage
 
     window_console.focus_force()
     window_root.mainloop() 
@@ -80,6 +99,9 @@ def _process_command(command_entry: tkinter.Entry, console_text: tkinter.Text) -
     console_text.see("end")
     console_text.config(state="disabled")
 
+def run_command(line: str) -> None:
+
+
 
 if __name__ == "__main__":
-    gui_run()
+    run()
