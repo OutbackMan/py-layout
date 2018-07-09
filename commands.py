@@ -5,22 +5,19 @@ import cmd
 import os
 import tkinter
 
-class CLICommandPrompt(cmd.Cmd):
+class Commands():
     def __init__(self):
-        super().__init__(self)
         self.intro = f"Welcome to {ITEST_Config.meta.name}. Type help or ? to list commands\n"
         self.prompt = f"({ITEST_Config.meta.name})"
 
     def preloop(self):
         self._local_variables = {}
         self._global_variables = {}
-        self._command_history = {}
 
     def postloop(self):
         # print exiting...
 
     def precmd(self, line):
-        self._command_history += [ line.strip() ]
         return line
 
     def postcmd(self, stop, line):
@@ -46,7 +43,7 @@ class CLICommandPrompt(cmd.Cmd):
         # print self._command_history
 
     def do_command(self, args):
-        '''This docstring text will be printed on help'''
+        '''Perform some operation: COMMAND ARG1 ARG2'''
         pass
 
     def complete_command(self, text, line, begidx, endidx):
@@ -61,10 +58,13 @@ class CLICommandPrompt(cmd.Cmd):
     def do_EOF(self, args):
         return True
 
+class CLICommandPrompt(cmd.Cmd, Commands):
+    def __init__(self):
+        super().__init__(self) # cooperative super()
 
-class GUICommandPrompt(CLICommandPrompt):
+class GUICommandPrompt(cmd.Cmd, Commands):
     def __init__(self, input_widget: tkinter.Entry, output_widget: tkinter.Text):
-        super().__init__(self)
+        super().__init__(self, stdin=input_widget, stdout=output_widget)
         self.use_rawinput = False
 
 x = CLICommandPrompt()
