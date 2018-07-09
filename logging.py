@@ -4,7 +4,40 @@ import logging
 import typing
 import tkinter
 
-def initialize(output_stream: typing.Union[typing.TextIO, tkinter.Text], log_file: str): 
+logger: logging.Logger = logging.getLogger(ITEST_Config.meta.name)
+
+def initialize_gui_logger(log_widget: tkinter.Text):
+    global logger
+
+    logger.setHandler(_GuiLoggerHandler(log_widget))
+    
+    if __debug__:
+        _add_debug_logger_settings(logger)
+    else:
+        _add_release_logger_settings(logger)
+
+def initialize_cli_logger():
+    global logger
+
+    if __debug__:
+        _add_debug_logger_settings(logger)
+    else:
+        _add_release_logger_settings(logger)
+
+def _add_debug_logger_settings():
+    logger.setLevel(logging.DEBUG)
+
+def _add_release_logger_settings():
+    logger.addFilter(_ReleaseLoggerFilter())
+
+    file_handler = logging.FileHandler(ITEST_Config.logging.log_file)
+    file_handler_formatter = logging.Formatter(ITEST_Config.logging.release_msg_format)
+    file_handler.setFormatter(file_handler_formatter)
+    file_handler.setLevel(logging.CRITICAL)
+    logger.addHandler(file_handler)
+
+
+def initialize_debug(output_stream: typing.Union[typing.TextIO, tkinter.Text], log_file: str): 
     logger: logging.Logger = logging.getLogger(f"{ITEST_Config.Meta.name}")
 
     if __debug__:
@@ -22,9 +55,6 @@ def initialize(output_stream: typing.Union[typing.TextIO, tkinter.Text], log_fil
         critical_level_file_handler.setLevel(logging.CRITICAL)
         logger.addHandler(critical_level_file_handler)
 
-        
-        if isinstance(output_stream: tkinter.Text):
-            logger.addHandler(_GuiLoggerHandler(output_stream))
 
         INFO_LEVEL_MSG_FORMAT_STR: str = "[%(name)s:%(levelname)s] \"%(message)s\""
 
@@ -51,10 +81,3 @@ class _GuiLoggerHandler(logging.StreamHandler):
         msg: str = self.format(log_record)
         self.output_text_widget.insert("end", msg + "\n")
         self.flush()
-
-if __debug__:
-    logging.basicConfig(level=logging.DEBUG, format=_LOGGER_MSG_FORMAT_STR, datefmt=_LOGGER_DATE_FORMAT_STR)
-else:
-    logging.basicConfig(filename="itest.log", level=logging.ERROR, format=_LOGGER_MSG_FORMAT_STR, datefmt=_LOGGER_DATE_FORMAT_STR)
-
-logger = logging.getLogger()

@@ -8,12 +8,30 @@ class Meta:
     version: str = "v0.0.1"
     description: str = "Some description"
     author: str = "Ryan McClue"
-    
+
+meta: Meta = Meta()
+
+@dataclasses.dataclass
+class Logging:
+    log_file: str = f"{meta.name.lower()}.log"
+    debug_msg_format: str = f"{meta.name.lower()}.log"
+    debug_date_format: str = f"{meta.name.lower()}.log"
+    release_msg_format: str = f"{meta.name.lower()}.log"
+    release_date_format: str = f"{meta.name.lower()}.log"
+
+logging: Logging = Logging()
+
 @dataclasses.dataclass
 class GUI:
-    pass
+    bg_color: str = "#123123"
+    fg_color: str = "#123123"
+    font: str = ""
+    font_color: str = "#123123"
 
-_dataclasses: typing.List[typing.Type[typing.Any]] = [Meta(), GUI()]
+gui: Gui = Gui()
+
+_ConfigDataclass: typing.TypeVar = typing.TypeVar("ConfigDataclass", Logging, GUI)
+_dataclasses: typing.List[_ConfigDataclass] = [logging, gui]
 
 def reload_if_changed() -> None:
     if os.path.exists("itest.ini"):

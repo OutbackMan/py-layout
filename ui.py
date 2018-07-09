@@ -1,4 +1,4 @@
-# import config-variables as ITEST_ConfigVariables
+import config as ITEST_Config
 
 import tkinter
 import typing
@@ -9,12 +9,13 @@ import typing
 # .config(background=bg_color, fg=foreground_color)
 # must do explicit import tkinter.font
 
-
-def run() -> None:
-    CONSOLE_TITLE: str = f"{ITEST_ConfigVariables.META.name} Console ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}"
+def run_gui() -> None:
+    CONSOLE_TITLE: str = f'''{ITEST_ConfigVariables.META.name} Console 
+                        ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}'''
     console_window: tkinter.Tk = _create_console_window(CONSOLE_TITLE)
 
-    VIEWER_TITLE: str = f"{ITEST_ConfigVariables.META.name} Viewer ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}"
+    VIEWER_TITLE: str = f'''{ITEST_ConfigVariables.META.name} Viewer 
+                        ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}'''
     viewer_window: tkinter.Toplevel = _create_viewer_window(console_window, VIEWER_TITLE)
 
     _center_windows(console_window, viewer_window)
@@ -31,6 +32,8 @@ def _create_console_window(window_title: str) -> tkinter.Tk:
 
     console_window_layout_frame = _create_console_window_layout_frame(console_window)
 
+    ITEST_Logging.initialize_gui_logger(text_widget)
+
     return console_window
 
 def _create_console_window_layout_frame(console_window: tkinter.Tk) -> tkinter.Frame:
@@ -41,23 +44,23 @@ def _create_console_window_layout_frame(console_window: tkinter.Tk) -> tkinter.F
     console_window_layout_frame.grid(column=0, row=0, sticky="nsew")
 
     '''
-    +---+---+
-    |   | 0 |
-    +---+---+
-    | 0 |
-    +---+
-    | 1 |
-    +---+
-    | 2 |
-    +---+
-    | 3 |
-    +---+
-    | 4 |
-    +---+
-    | 5 |
-    +---+
-    | 6 |
-    +---+
+    +---+---+---+---+---+---+---+---+
+    |   | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+    +---+---+---+---+---+---+---+---+
+    | 0 |                       | S |
+    +---+   OUTPUT              + C +
+    | 1 |                       | R |
+    +---+                       + O +
+    | 2 |                       | L |
+    +---+                       + L +
+    | 3 |                       |   |
+    +---+                       +   +
+    | 4 |                       |   |
+    +---+---+---+---+---+---+---+---+
+    | 5 |   |   |   |   |   |   |   |
+    +---+---+---+---+---+---+---+---+
+    | 6 |   INPUT           | ENTER |
+    +---+---+---+---+---+---+---+---+
     '''
 
     console_window_frame.grid_columnconfigure(0, weight=10)
