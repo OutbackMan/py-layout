@@ -9,6 +9,7 @@ import typing
 # .config(background=bg_color, fg=foreground_color)
 # must do explicit import tkinter.font
 
+
 def run() -> None:
     CONSOLE_TITLE: str = f"{ITEST_ConfigVariables.META.name} Console ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}"
     console_window: tkinter.Tk = _create_console_window(CONSOLE_TITLE)
@@ -21,6 +22,7 @@ def run() -> None:
     # NOTE(Ryan): may not need as we focus entry widget 
     console_window.focus_force() 
 
+    tkinter.after(0, ITEST_Config.reload_if_changed())
     tkinter.mainloop()  
 
 def _create_console_window(window_title: str) -> tkinter.Tk:
