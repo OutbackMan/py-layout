@@ -1,7 +1,8 @@
 import configparser
 import typing
+import dataclasses
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Meta:
     name: str = "ITest"
     version: str = "v0.0.1"
