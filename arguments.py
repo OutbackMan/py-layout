@@ -5,8 +5,8 @@ import typing
 
 def parse_cmd_line_args(args: typing.List[str]) -> argparse.Namespace:
     arg_parser = argparse.ArgumentParser(
-                                    description=f"""{ITEST_Config.Meta.name}, {ITEST_Config.Meta.version}\n
-                                                    {ITEST_Config.Meta.description}""", 
+                                    description=f'''{ITEST_Config.Meta.name}, {ITEST_Config.Meta.version}\n
+                                                    {ITEST_Config.Meta.description}''', 
                                     epilog=f"Copyright (C) 2018, {ITEST_Config.Meta.author}"
                                     formatter_class=argparse.RawDescriptionHelpFormatter
                                 )
