@@ -1,21 +1,71 @@
-import cmd
+import config as ITEST_Config
+import logging as ITEST_Logging
 
-class CommandPrompt(cmd.Cmd):
-    def __init__(self, stdin, stdout, want_gui):
-        super.__init__(self)
-        intro = "Welcome to asdasd. Type help or ? to list commands\n"
-        prompt = "(asdasd)"
-        if (want_gui):
-            self.use_rawinput = False
-    def do_command(self, args):
-        "This text will be printed on help"
-        pass
+import cmd
+import os
+import tkinter
+
+class CLICommandPrompt(cmd.Cmd):
+    def __init__(self):
+        super().__init__(self)
+        self.intro = f"Welcome to {ITEST_Config.meta.name}. Type help or ? to list commands\n"
+        self.prompt = f"({ITEST_Config.meta.name})"
+
+    def preloop(self):
+        self._local_variables = {}
+        self._global_variables = {}
+        self._command_history = {}
+
+    def postloop(self):
+        # print exiting...
+
+    def precmd(self, line):
+        self._command_history += [ line.strip() ]
+        return line
+
+    def postcmd(self, stop, line):
+        # return true if want to quit
+        return stop
 
     def do_help(self, args):
+        '''we just want this docstring '''
+        super().do_help(self, args)
+
+    def do_shell(self, args):
+        ''' when line begins with !'''
+        os.system(args)
+
+    def default(self, line):
+        ''' execute python code '''
+        try:
+            exec(line, self._local_variables, self._global_variables) 
+        except:
+           # print info  
+    
+    def do_hist(self, line):
+        # print self._command_history
+
+    def do_command(self, args):
+        '''This docstring text will be printed on help'''
+        pass
+
+    def complete_command(self, text, line, begidx, endidx):
+        return [i for i in parameter_options if i.startswith(text)] 
+
+    def do_exit(self, args):
+        # return some notifier
+
+    def emptyline(self):
         pass
 
     def do_EOF(self, args):
         return True
 
 
+class GUICommandPrompt(CLICommandPrompt):
+    def __init__(self, input_widget: tkinter.Entry, output_widget: tkinter.Text):
+        super().__init__(self)
+        self.use_rawinput = False
 
+x = CLICommandPrompt()
+x.cmdloop()
