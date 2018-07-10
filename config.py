@@ -14,10 +14,11 @@ meta: Meta = Meta()
 @dataclasses.dataclass
 class Logging:
     log_file: str = f"{meta.name.lower()}.log"
-    debug_msg_format: str = f"{meta.name.lower()}.log"
-    debug_date_format: str = f"{meta.name.lower()}.log"
-    release_msg_format: str = f"{meta.name.lower()}.log"
-    release_date_format: str = f"{meta.name.lower()}.log"
+    debug_msg_format: str = '''[%(name)s:%(levelname)s] (%(asctime)s) - 
+                                %(filename)s:%(funcName)s():%(lineno)s "%(message)s"'''
+    debug_date_format: str = "%d/%m/%Y, %H:%M:%S"
+    release_msg_format: str = "%(message)s"
+    release_date_format: str = "%d/%m/%Y, %H:%M:%S"
 
 logging: Logging = Logging()
 
