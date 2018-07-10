@@ -6,23 +6,18 @@ import tkinter
 
 logger: logging.Logger = logging.getLogger(ITEST_Config.meta.name)
 
+if __debug__:
+    _add_debug_logger_settings(logger)
+else:
+    _add_release_logger_settings(logger)
+
 def initialize_gui_logger(log_widget: tkinter.Text):
     global logger
 
     logger.setHandler(_GuiLoggerHandler(log_widget))
     
-    if __debug__:
-        _add_debug_logger_settings(logger)
-    else:
-        _add_release_logger_settings(logger)
-
 def initialize_cli_logger():
     global logger
-
-    if __debug__:
-        _add_debug_logger_settings(logger)
-    else:
-        _add_release_logger_settings(logger)
 
 def _add_debug_logger_settings():
     logger.setLevel(logging.DEBUG)

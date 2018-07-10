@@ -1,6 +1,7 @@
 import config as ITEST_Config
 
 import tkinter
+import tkinter.font
 import typing
 
 # font, text colour (red and normal)
@@ -9,13 +10,20 @@ import typing
 # .config(background=bg_color, fg=foreground_color)
 # must do explicit import tkinter.font
 
+def _font_handling():
+    custom_font: tkinter.font.Font = tkinter.font.Font(ITEST_Config.gui.font_family, ITEST_Config.gui.font_size, ITEST_Config.gui.font_weight)
+
+    # text_widget.highlight_pattern("pattern", "TAG_NAME")
+    text_widget.tag_configure("TAG_NAME", foreground=ITEST_Config.gui.font_colour, font=custom_font)
+    text_widget.tag_add("TAG_NAME", "start", "end")
+
 def run_gui() -> None:
-    CONSOLE_TITLE: str = f'''{ITEST_ConfigVariables.META.name} Console 
-                        ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}'''
+    CONSOLE_TITLE: str = f'''{ITEST_Config.meta.name} Console 
+                        ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_Config.meta.version}'''
     console_window: tkinter.Tk = _create_console_window(CONSOLE_TITLE)
 
-    VIEWER_TITLE: str = f'''{ITEST_ConfigVariables.META.name} Viewer 
-                        ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_ConfigVariables.META.version}'''
+    VIEWER_TITLE: str = f'''{ITEST_Config.meta.name} Viewer 
+                        ({'DEBUG' if __debug__ else 'RELEASE'}) - {ITEST_Config.meta.version}'''
     viewer_window: tkinter.Toplevel = _create_viewer_window(console_window, VIEWER_TITLE)
 
     _center_windows(console_window, viewer_window)
@@ -32,7 +40,29 @@ def _create_console_window(window_title: str) -> tkinter.Tk:
 
     console_window_layout_frame = _create_console_window_layout_frame(console_window)
 
-    ITEST_Logging.initialize_gui_logger(text_widget)
+    console_window_text: tkinter.Text = tkinter.Text(master=console_window_layout_frame, wrap="word")
+    console_window_text.config(state="disabled")
+    console_window_text.grid(row=0, column=0, rowspan=5, columnspan=6, sticky="nsew")
+    console_window_text_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(master=console_window_layout_frame)
+    console_window_text.configure(yscrollcommand=console_window_text_scrollbar.set)
+    console_window_text_scrollbar.config(command=console_window_text.yview)
+    console_window_text_scrollbar.grid(row=0, rowspan=5, column=6, sticky="nsw")
+
+    ITEST_Logging.initialize_gui_logger(console_window_text)
+
+    console_window_command_entry: tkinter.Entry = tkinter.Entry(master=console_window_layout_frame)
+    console_window_command_entry.grid(row=6, column=0, columnspan=5, sticky="we", ipady="2", ipadx="2")
+    console_window_command_entry.focus_set()
+
+    command_interpreter: ITEST_UI.GUICommandInterpreter = ITEST_UI.create_gui_command_interpreter()
+
+    process_command: typing.Callable[[tkinter.Event], None] = lambda event: command_interpreter.process_command() 
+    console_window_command_entry.bind("<Return>", process_command)
+
+    console_window_command_entry_button: tkinter.Button = tkinter.Button(master=console_window_frame, text="Enter")
+    console_window_command_entry_button.bind("<Button-1>", process_command)
+    console_window_command_entry_button.grid(row=6, column=5, columnspan=2, sticky="we")
+
 
     return console_window
 
@@ -48,7 +78,7 @@ def _create_console_window_layout_frame(console_window: tkinter.Tk) -> tkinter.F
     |   | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
     +---+---+---+---+---+---+---+---+
     | 0 |                       | S |
-    +---+   OUTPUT              + C +
+    +---+   TEXT                + C +
     | 1 |                       | R |
     +---+                       + O +
     | 2 |                       | L |
@@ -59,26 +89,26 @@ def _create_console_window_layout_frame(console_window: tkinter.Tk) -> tkinter.F
     +---+---+---+---+---+---+---+---+
     | 5 |   |   |   |   |   |   |   |
     +---+---+---+---+---+---+---+---+
-    | 6 |   INPUT           | ENTER |
+    | 6 |   ENTRY           | BTN   |
     +---+---+---+---+---+---+---+---+
     '''
 
-    console_window_frame.grid_columnconfigure(0, weight=10)
-    console_window_frame.grid_columnconfigure(1, weight=10)
-    console_window_frame.grid_columnconfigure(2, weight=10)
-    console_window_frame.grid_columnconfigure(3, weight=10)
-    console_window_frame.grid_columnconfigure(4, weight=10)
-    console_window_frame.grid_columnconfigure(5, weight=10)
-    console_window_frame.grid_columnconfigure(6, weight=1)
-    console_window_frame.grid_rowconfigure(0, weight=10)
-    console_window_frame.grid_rowconfigure(1, weight=10)
-    console_window_frame.grid_rowconfigure(2, weight=10)
-    console_window_frame.grid_rowconfigure(3, weight=10)
-    console_window_frame.grid_rowconfigure(4, weight=10)
-    console_window_frame.grid_rowconfigure(5, weight=1)
-    console_window_frame.grid_rowconfigure(6, weight=10)
+    console_window_layout_frame.grid_columnconfigure(0, weight=10)
+    console_window_layout_frame.grid_columnconfigure(1, weight=10)
+    console_window_layout_frame.grid_columnconfigure(2, weight=10)
+    console_window_layout_frame.grid_columnconfigure(3, weight=10)
+    console_window_layout_frame.grid_columnconfigure(4, weight=10)
+    console_window_layout_frame.grid_columnconfigure(5, weight=10)
+    console_window_layout_frame.grid_columnconfigure(6, weight=1)
+    console_window_layout_frame.grid_rowconfigure(0, weight=10)
+    console_window_layout_frame.grid_rowconfigure(1, weight=10)
+    console_window_layout_frame.grid_rowconfigure(2, weight=10)
+    console_window_layout_frame.grid_rowconfigure(3, weight=10)
+    console_window_layout_frame.grid_rowconfigure(4, weight=10)
+    console_window_layout_frame.grid_rowconfigure(5, weight=1)
+    console_window_layout_frame.grid_rowconfigure(6, weight=10)
 
-    return console_window_frame_layout
+    return console_window_layout_frame
 
 
 def _create_viewer_window(console_window: tkinter.Tk, window_title: str) -> tkinter.Toplevel:
@@ -94,25 +124,6 @@ def _center_windows(window1: tkinter.Tk, window2: tkinter.Toplevel) -> None:
     window_console.geometry(f"{WINDOW_CONSOLE_WIDTH}x{WINDOW_CONSOLE_HEIGHT}+{WINDOW_CONSOLE_X}+{WINDOW_CONSOLE_Y}")
 
 
-    window_console_text: tkinter.Text = tkinter.Text(master=window_console_frame, wrap="word")
-    window_console_text.insert("end", "Hello there!\n")
-    window_console_text.config(state="disabled")
-    window_console_text.grid(row=0, column=0, rowspan=5, columnspan=6, sticky="nsew")
-    window_console_text_scrollbar: tkinter.Scrollbar = tkinter.Scrollbar(master=window_console_frame)
-    window_console_text.configure(yscrollcommand=window_console_text_scrollbar.set)
-    window_console_text_scrollbar.config(command=window_console_text.yview)
-    window_console_text_scrollbar.grid(row=0, rowspan=5, column=6, sticky="nsw")
-
-    window_console_command_entry: tkinter.Entry = tkinter.Entry(master=window_console_frame)
-    window_console_command_entry.grid(row=6, column=0, columnspan=5, sticky="we", ipady="2", ipadx="2")
-    window_console_command_entry.focus_set()
-
-    process_command: typing.Callable[[tkinter.Event], None] = lambda event: _process_command(window_console_command_entry, window_console_text)
-    window_console_command_entry.bind("<Return>", process_command)
-    window_console_command_entry_button: tkinter.Button = tkinter.Button(master=window_console_frame, text="Enter")
-    window_console_command_entry_button.bind("<Button-1>", process_command)
-
-    window_console_command_entry_button.grid(row=6, column=5, columnspan=2, sticky="we")
 
     WINDOW_VIEWER_X: int = WINDOW_CONSOLE_X + WINDOW_MARGIN_WIDTH + WINDOW_VIEWER_WIDTH
     WINDOW_VIEWER_Y: int = int((SCREEN_HEIGHT / 2) - ((WINDOW_VIEWER_HEIGHT) / 2))
@@ -123,18 +134,6 @@ def _center_windows(window1: tkinter.Tk, window2: tkinter.Toplevel) -> None:
 
     window_console.focus_force()
     window_root.mainloop() 
-
-def _process_command(command_entry: tkinter.Entry, console_text: tkinter.Text) -> None:
-    text: str = command_entry.get()
-    command_entry.delete(0, "end")  
-    console_text.config(state="normal")
-    console_text.insert("end", f"{text}\n")
-    console_text.see("end")
-    console_text.config(state="disabled")
-
-def run_command(line: str) -> None:
-
-
 
 if __name__ == "__main__":
     run()

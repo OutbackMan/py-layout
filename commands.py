@@ -5,16 +5,19 @@ import cmd
 import os
 import tkinter
 
+def initialize_cli_command_interpreter() -> CLICommandInterpreter:
+    return CLICommandInterpreter()
+
+def initialize_gui_command_interpreter(gui_stdin: GUIStdin, gui_stdout: GUIStdout) -> GUICommandInterpreter:
+    return GUICommandInterpreter(gui_stdin, gui_stdout)
+
 class Commands():
     def __init__(self):
-        self.intro = f"Welcome to {ITEST_Config.meta.name}. Type help or ? to list commands\n"
-        self.prompt = f"({ITEST_Config.meta.name})"
-
-    def preloop(self):
         self._local_variables = {}
         self._global_variables = {}
+        self.intro = f"Welcome to {ITEST_Config.meta.name}. Type help or ? to list commands\n"
 
-    def postloop(self):
+    def on_exit(self):
         # print exiting...
 
     def precmd(self, line):
@@ -58,14 +61,48 @@ class Commands():
     def do_EOF(self, args):
         return True
 
-class CLICommandPrompt(cmd.Cmd, Commands):
+class CLICommandInterpreter(cmd.Cmd, Commands):
     def __init__(self):
-        super().__init__(self) # cooperative super()
+        super().__init__(self)
 
-class GUICommandPrompt(cmd.Cmd, Commands):
-    def __init__(self, input_widget: tkinter.Entry, output_widget: tkinter.Text):
-        super().__init__(self, stdin=input_widget, stdout=output_widget)
-        self.use_rawinput = False
+    # TODO(Ryan)
+    def process_command(self):
+        pass
 
-x = CLICommandPrompt()
-x.cmdloop()
+class GUICommandInterpreter(cmd.Cmd, Commands):
+    def __init__(self, stdin: GUIStdin, stdout: GUIStdout):
+        super().__init__(self, stdin=stdin, stdout=stdout)
+
+        self.stdout.write(f"{self.intro}\n")
+        self.stdout.flush()
+
+    def process_command(self):
+        line: str = self.stdin.readline()
+        if not len(line):
+            line = "EOF"
+        else:
+            line = line.rstrip("\r\n")
+        line = self.precmd(line)
+        self.onecmd(line)
+        self.postcmd(False, line)
+
+class GUIStdin():
+    def __init__(self, input_widget: tkinter.Entry):
+        self.input_widget = input_widget
+
+    def readline() -> str:
+        line: str = self.input_widget.get() 
+        self.input_widget.delete(0, "end")
+        return line
+
+class GUIStdout():
+    def __init__(self, output_widget: tkinter.Text):
+        self.output_widget = output_widget
+
+    def write(text: str) -> None:
+        self.output_widget.config(state="normal")
+        self.output_widget.insert("end", f"{text}\n")
+        self.output_widget.see("end")
+
+    def flush() -> None:
+        self.output_widget.config(state="disabled")
