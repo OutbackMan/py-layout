@@ -19,7 +19,7 @@ class _ReleaseLoggerFilter(logging.Filter):
     def __init__(self):
         super().__init__(self)
     def filter(self, log_record):
-        return log_record.levelno in (logging.INFO, logging.CRITICAL)
+        return log_record.levelno in (logging.INFO, logging.WARNING, logging.CRITICAL)
 
 class _ReleaseLoggerFileHandler(logging.FileHandler):
     def __init__(self, file_name: str):
