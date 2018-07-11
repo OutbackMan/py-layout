@@ -7,16 +7,8 @@ PILLOW:
 PYAUTOGUI:
 linux --> scrot
 '''
-
-# could optimise via c binding
 import pyautogui
 
-desktop_screenshot = pyautogui.screenshot()
-pyautogui.keyDown("shift")
-pyautogui.press("left")
-pyautogui.press("left")
-pyautogui.keyUp("shift")
-pyautogui.typewrite("text here")
 
 
 # moment is a weighted average of the pixels, giving a rough description of the shape

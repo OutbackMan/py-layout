@@ -1,35 +1,56 @@
-#include <Python.h>
+#include "screenshot.h"
 
-// IBU (image bot utils)
-#if defined(__linux__)		
-#define HOST_OS "LINUX"
-#include <X11/Xlib.h>
-#elif defined(_WIN32)
-#include <windows.h>
-#define HOST_OS "WINDOWS"
-#elif defined(__APPLE__)
-#define HOST_OS "MAC"
-#include <ApplicationServices/ApplicationServices.h>
-#else
-#error "Your OS is not supported. Supported OSs are windows, mac and linux"
-
-PyObject* IBU_screenshot(void)
+PyObject* screenshot(void)
 {
 	Py_Initialize();
 	// PySys_SetPath("/usr/home");
 
 	PyObject* numpy_string = PyString_FromString("numpy");
-	// if (numpy_string != NULL)
-	PyObject* numpy_module = PyImport_Import(numpy_string);
-	if (numpy_module != NULL) {
+	if (numpy_string == NULL) goto error;
 
-	} else {
-		PyErr_Print();		
-		return NULL;
+	PyObject* numpy_module_handler = PyImport_Import(numpy_string);
+	if (numpy_module_handler == NULL) goto error;
+
+	PyObject* numpy_asarray = PyObject_GetAttrString(numpy_module_handler, "asarray");
+	if (numpy_asarray == NULL || PyCallable_Check(numpy_asarray)) goto error;
+
+	SCREENSHOT_ImgData* img_data = NULL;
+#if defined(SCREENSHOT_USING_LINUX)
+	img_data = screenshot__linux();	
+#elif defined(SCEENSHOT_USING_WINDOWS)
+	img_data = screenshot__windows();	
+#else
+	img_data = screenshot__mac();	
+
+
+
+	PyObject* img_pixel_list = PyTuple_New(img_data.width * img_data.height); 
+	for (int img_pixel_index = 0; img_pixel_index < img_data.width * img_data.height; ++img_pixel_index) {
+		PyObject* img_pixel_info = PyTuple_New(3); 
+		PyTuple_SetItem(img_pixel_info, 0, *img_data.bgr_pixels++);
+		PyTuple_SetItem(img_pixel_info, 1, *img_data.bgr_pixels++);
+		PyTuple_SetItem(img_pixel_info, 2, *img_data.bgr_pixels++);
+
+		PyTuple_SetItem(img_pixel_list, index, img_pixel_info);
 	}
+
+
+	PyObject* screenshot = PyObject_CallObject(numpy_asarray, argument_holder);
+	if (screenshot == NULL) goto error;
+
+	free(img_data);
+	Py_Finalize();
+
+	return screenshot;
+
+	// may have to do frees also
+	error:
+		PyErr_Print();		
+		Py_Finalize();
+		return NULL;
 }
 
-PyObject* IBU__linux_screenshot(void)
+SCREENSHOT__ImgData* screenshot__linux(void)
 {
 	Display* display = XOpenDisplay("");
 	Window root = DefaultRootWindow(display);
@@ -119,26 +140,6 @@ PyObject* IBU__mac_screenshot(void)
 
 }
 
-
-int main(int argc, char** argv)
-{
-
-	PyObject* argument_holder = PyTuple_New(1); 
-	PyObject* argument = PyString_FromString("arg1");
-	PyTuple_SetItem(argument_holder, 0, argument);
-
-
-	// if (numpy_asarray != NULL && PyCallable_Check(numpy_asarray))
-	PyObject* numpy_asarray = PyObject_GetAttrString(numpy_module, "asarray");
-	PyObject* ret_val = PyObject_CallObject(numpy_asarray, argument_holder);
-
-
-	
-
-	Py_Finalize();
-
-	return 0;
-}
 
 
 
