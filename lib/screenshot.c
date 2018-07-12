@@ -1,5 +1,16 @@
 #include "screenshot.h"
 
+#include "common.h"
+
+#if defined(SCREENSHOT_USING_LINUX)		
+#include <X11/Xlib.h>
+#elif defined(SCREENSHOT_USING_WINDOWS)
+#include <windows.h>
+#else 
+#include <ApplicationServices/ApplicationServices.h>
+
+static PyObject* screenshot__bgr_pixel_tuple();
+
 PyObject* screenshot(void)
 {
 	Py_Initialize();
@@ -14,31 +25,12 @@ PyObject* screenshot(void)
 	PyObject* numpy_asarray = PyObject_GetAttrString(numpy_module_handler, "asarray");
 	if (numpy_asarray == NULL || PyCallable_Check(numpy_asarray)) goto error;
 
-	SCREENSHOT_ImgData* img_data = NULL;
-#if defined(SCREENSHOT_USING_LINUX)
-	img_data = screenshot__linux();	
-#elif defined(SCEENSHOT_USING_WINDOWS)
-	img_data = screenshot__windows();	
-#else
-	img_data = screenshot__mac();	
+	PyObject* img_bgr_pixel_tuple = screenshot__bgr_pixel_tuple();	
 
 
-
-	PyObject* img_pixel_list = PyTuple_New(img_data.width * img_data.height); 
-	for (int img_pixel_index = 0; img_pixel_index < img_data.width * img_data.height; ++img_pixel_index) {
-		PyObject* img_pixel_info = PyTuple_New(3); 
-		PyTuple_SetItem(img_pixel_info, 0, *img_data.bgr_pixels++);
-		PyTuple_SetItem(img_pixel_info, 1, *img_data.bgr_pixels++);
-		PyTuple_SetItem(img_pixel_info, 2, *img_data.bgr_pixels++);
-
-		PyTuple_SetItem(img_pixel_list, index, img_pixel_info);
-	}
-
-
-	PyObject* screenshot = PyObject_CallObject(numpy_asarray, argument_holder);
+	PyObject* screenshot = PyObject_CallObject(numpy_asarray, img_bgr_pixel_tuple);
 	if (screenshot == NULL) goto error;
 
-	free(img_data);
 	Py_Finalize();
 
 	return screenshot;
@@ -50,8 +42,18 @@ PyObject* screenshot(void)
 		return NULL;
 }
 
-SCREENSHOT__ImgData* screenshot__linux(void)
+	for (int img_pixel_index = 0; img_pixel_index < img_data.width * img_data.height; ++img_pixel_index) {
+		PyObject* img_pixel_info = PyTuple_New(3); 
+		PyTuple_SetItem(img_pixel_info, 0, *img_data.bgr_pixels++);
+		PyTuple_SetItem(img_pixel_info, 1, *img_data.bgr_pixels++);
+		PyTuple_SetItem(img_pixel_info, 2, *img_data.bgr_pixels++);
+
+		PyTuple_SetItem(img_pixel_list, index, img_pixel_info);
+	}
+
+static PyObject* screenshot__bgr_pixel_tuple(void)
 {
+#if defined(SCREENSHOT_USING_LINUX)
 	Display* display = XOpenDisplay("");
 	Window root = DefaultRootWindow(display);
 
