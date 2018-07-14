@@ -124,13 +124,13 @@ PyObject* IBU__mac_screenshot(void)
 	CGDataProviderRef provider = CGImageGetDataProvider(image_ref);
 	CFDataRef dataref = CGDataProviderCopyData(provider);
 
-	unsigned char* pixels = CFDataGetBytePtr(dataref);
+	const uint8_t* pixels = CFDataGetBytePtr(dataref);
 
 	for (int x = 0; x < image_width; ++x) {
 		for (int y = 0; y < image_width; ++y) {
-			unsigned char red_pixel = *pixels++;
-			unsigned char green_pixel = *pixels++;
-			unsigned char blue_pixel = *pixels++;
+			const uint8_t red_pixel = *pixels++;
+			const uint8_t green_pixel = *pixels++;
+			const uint8_t blue_pixel = *pixels++;
 		}		
 	}
 
